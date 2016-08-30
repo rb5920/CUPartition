@@ -42,8 +42,9 @@ cc_library(
 			"TEncSlice.h",
 			"TEncTop.h",
 			"WeightPredAnalysis.h"],
-	copts = ["-Itensorflow/HM_BAZEL"],
-	deps = ["//tensorflow/HM_BAZEL/TLibCommon:TLibCommon"],
+	copts = ["-Itensorflow/HM_BAZEL","-Itensorflow/HM_BAZEL/NEURAL_CUP"],
+	deps = ["//tensorflow/HM_BAZEL/TLibCommon:TLibCommon",
+			"//tensorflow/HM_BAZEL/NEURAL_CUP:NEURAL_CUP"],
     visibility = ["//visibility:public"],
 )
 cc_inc_library(

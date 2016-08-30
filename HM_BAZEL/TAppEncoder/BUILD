@@ -2,7 +2,8 @@ cc_binary(
     name = "TAppEncoder",
     srcs = ["encmain.cpp"],
 	copts = ["-Itensorflow/HM_BAZEL"],
-	deps = [":TAppEncoder_lib"]
+	deps = [":TAppEncoder_lib",
+					"//tensorflow/HM_BAZEL/NEURAL_CUP:NEURAL_CUP"]
 )
 cc_library(
     name = "TAppEncoder_lib",
@@ -12,5 +13,6 @@ cc_library(
 			"TAppEncTop.h"],
 	copts = ["-Itensorflow/HM_BAZEL"],
 	deps = ["//tensorflow/HM_BAZEL/TLibEncoder:TLibEncoder",
-			"//tensorflow/HM_BAZEL/TAppCommon:TAppCommon",],
+			"//tensorflow/HM_BAZEL/TAppCommon:TAppCommon",
+			"//tensorflow/HM_BAZEL/NEURAL_CUP:NEURAL_CUP"],
 )

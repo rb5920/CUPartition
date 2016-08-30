@@ -10,9 +10,9 @@ visibility = ["//visibility:public"],
 
 cc_library(
     name = "NEURAL_CUP",
-    srcs = ["neural_cup.cc"],
+    srcs = ["neural_cup.cpp"],
 	hdrs = ["neural_cup.h"],
-	copts = ["-Itensorflow/HM_BAZEL/NEURAL_CUP"],
+	copts = ["-Itensorflow/HM_BAZEL"],
     deps = [
         "//tensorflow/cc:cc_ops",
         "//tensorflow/core:tensorflow",

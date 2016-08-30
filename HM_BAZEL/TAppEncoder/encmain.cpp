@@ -39,7 +39,6 @@
 #include <iostream>
 #include "TAppEncTop.h"
 #include "TAppCommon/program_options_lite.h"
-
 //! \ingroup TAppEncoder
 //! \{
 
@@ -66,7 +65,8 @@ int main(int argc, char* argv[])
 
   // create application encoder class
   cTAppEncTop.create();
-
+	TF_neural model16;
+	model16.Create();
   // parse configuration
   try
   {
@@ -104,6 +104,7 @@ int main(int argc, char* argv[])
   FILENAME = EXPNAME + getfilename + FILETYPE;
   gfpCUP = fopen(FILENAME.c_str(), "w");*/
   cTAppEncTop.encode();
+	model16.Destroy();
   fclose(gfpCUP);
   // ending time
   dResult = (Double)(clock()-lBefore) / CLOCKS_PER_SEC;

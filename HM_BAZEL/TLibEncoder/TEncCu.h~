@@ -45,7 +45,7 @@
 #include "TLibCommon/TComTrQuant.h"
 #include "TLibCommon/TComBitCounter.h"
 #include "TLibCommon/TComDataCU.h"
-
+#include "NEURAL_CUP/neural_cup.h"
 #include "TEncEntropy.h"
 #include "TEncSearch.h"
 #include "TEncRateCtrl.h"

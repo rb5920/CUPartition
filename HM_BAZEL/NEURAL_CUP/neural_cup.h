@@ -17,4 +17,18 @@
 #include "tensorflow/core/platform/env.h"
 using namespace tensorflow;
 using namespace std;
-bool neural_cup(float* readinput);
+
+class TF_neural{
+	private:
+		static Session* session;
+		static GraphDef graph_def;
+		static Status status;
+		static std::vector<std::pair<string, tensorflow::Tensor>> inputs;
+		static std::vector<tensorflow::Tensor> outputs;
+		static vector<Tensor>::iterator it;
+	public:
+		int Create();
+		int Destroy();
+		bool neural_cup(float* readinput);
+};
+

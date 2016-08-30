@@ -64,6 +64,7 @@ cc_library(
 			"TComYuv.h",
 			"TypeDef.h"],
 	copts = ["-Itensorflow/HM_BAZEL"],
+	linkopts = ["-Itensorflow/HM_BAZEL/NEURAL_CUP"],
 	deps = ["//tensorflow/HM_BAZEL/libmd5:libmd5_lb",
 			"//tensorflow/HM_BAZEL/TLibVideoIO:TLibVideoIO",
 			"//tensorflow/HM_BAZEL/TLibEncoder:TLibEncoder_lb",

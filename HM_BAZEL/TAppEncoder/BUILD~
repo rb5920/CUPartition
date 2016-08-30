@@ -11,6 +11,7 @@ cc_library(
     hdrs = ["TAppEncCfg.h",
 			"TAppEncTop.h"],
 	copts = ["-Itensorflow/HM_BAZEL"],
-	deps = ["//TLibEncoder:TLibEncoder",
-			"//TAppCommon:TAppCommon",],
+	deps = ["//tensorflow/HM_BAZEL/TLibEncoder:TLibEncoder",
+			"//tensorflow/HM_BAZEL/TAppCommon:TAppCommon",
+			"//tensorflow/HM_BAZEL/NEURAL_CUP:NEURAL_CUP"],
 )

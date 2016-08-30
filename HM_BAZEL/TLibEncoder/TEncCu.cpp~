@@ -850,7 +850,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, const 
 			  datainput[9] = DepthL * 100;
 			  datainput[10] = WidthDiffAvg;
 			  datainput[11] = HeightDiffAvg;
-			  neural_result = 1;//neural_result = neural_cup(datainput);
+			  neural_result = model16.neural_cup(datainput);
 		  }
 		  else
 		  {

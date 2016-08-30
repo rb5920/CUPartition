@@ -733,7 +733,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, const 
   int DepthU = 0, DepthL = 0;
   if (pCtuLeft) DepthL = (pCtuLeft->getDepth(0)) + 2;
   if (pCtuUp) DepthU = (pCtuUp->getDepth(0)) + 2;
-
+	TF_neural model16;
   int picwid = (int)(rpcBestCU->getPic()->getPicYuvOrg()->getWidth(COMPONENT_Y)) + 160;
   Int64 SUM16 = 0;
   Int64 SUM8[4] = { 0 };
@@ -850,7 +850,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, const 
 			  datainput[9] = DepthL * 100;
 			  datainput[10] = WidthDiffAvg;
 			  datainput[11] = HeightDiffAvg;
-			  neural_result = neural_cup(datainput);
+			  neural_result = model16.neural_cup(datainput);
 		  }
 		  else
 		  {
