@@ -2,7 +2,7 @@
 #include "neural_cup.h"
 using namespace tensorflow;
 using namespace std;
-bool neural_cup(float* readinput) {
+bool neural_cup(float readinput[]) {
 
   // Initialize a tensorflow session
   Session* session;
@@ -17,7 +17,7 @@ bool neural_cup(float* readinput) {
   // when using `bazel run` since the cwd isn't where you call
   // `bazel run` but from inside a temp folder.)
   GraphDef graph_def;
-  status = ReadBinaryProto(Env::Default(), "models/ret2.pb", &graph_def);
+  status = ReadBinaryProto(Env::Default(), "models/rec_SIGMASIGMA.pb", &graph_def);
   if (!status.ok()) {
     std::cout << status.ToString() << "\n";
     return 0;
@@ -35,8 +35,8 @@ bool neural_cup(float* readinput) {
   // Our graph doesn't require any inputs, since it specifies default values,
   // but we'll change an input to demonstrate.
  
-  Tensor x(DT_FLOAT, TensorShape({1,14}));
-  for(int s=0;s<14;s++)
+  Tensor x(DT_FLOAT, TensorShape({1,12}));
+  for(int s=0;s<12;s++)
   {
     x.matrix<float>()(0,s) = *(readinput + s);
   }
@@ -48,13 +48,13 @@ bool neural_cup(float* readinput) {
   // The session will initialize the outputs
   std::vector<tensorflow::Tensor> outputs;
   Tensor checkpoint_filepath(DT_STRING, TensorShape());
-  checkpoint_filepath.scalar<std::string>()() = "models/recordCUPDATA2";
+  checkpoint_filepath.scalar<std::string>()() = "models/rec_SIGMASIGMA";
   session->Run( {{ "save/Const", checkpoint_filepath },}, 
                        {}, {"save/restore_all"}, &outputs);
   
   //std::vector<tensorflow::Tensor> outputs;
   // Run the session, evaluating our "c" operation from the graph
-  session->Run(inputs, {"add_4"}, {}, &outputs);
+  session->Run(inputs, {"softmax_linear/logits"}, {}, &outputs);
   
 
   // Grab the first output (we only evaluated one graph node: "c")
@@ -62,8 +62,8 @@ bool neural_cup(float* readinput) {
   //auto output_c = outputs[0].scalar<float>();
   vector<Tensor>::iterator it = outputs.begin();
   auto items = it->shaped<float, 2>({1, 2});
-  std::cout<<items(0,0)<<"\n";
-  std::cout<<items(0,1)<<"\n";
+  //std::cout<<items(0,0)<<"\n";
+  //std::cout<<items(0,1)<<"\n";
   if (items(0,0)>items(0,1))
   {
     session->Close();

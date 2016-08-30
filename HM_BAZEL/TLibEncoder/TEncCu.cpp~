@@ -728,54 +728,36 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, const 
   const Pel *ptrSrc_5920 = rpcBestCU->getPic()->getPicYuvOrg()->getAddr(COMPONENT_Y, rpcBestCU->getCtuRsAddr(), rpcBestCU->getZorderIdxInCtu());
   int CtuAbove[4];
   int CtuLeft[4];
-  int SkipmodeU = 0, SkipmodeL = 0;
   TComDataCU *pCtuUp = rpcBestCU->getCtuAbove();
   TComDataCU *pCtuLeft = rpcBestCU->getCtuLeft();
-  if (pCtuUp)
-  {
-	  CtuAbove[0] = pCtuUp->getDepth(160);
-	  CtuAbove[1] = pCtuUp->getDepth(176);
-	  CtuAbove[2] = pCtuUp->getDepth(224);
-	  CtuAbove[3] = pCtuUp->getDepth(240);
-	  SkipmodeU = pCtuUp->isSkipped(160) || pCtuUp->isSkipped(176) || pCtuUp->isSkipped(224) || pCtuUp->isSkipped(240);
+  int DepthU = 0, DepthL = 0;
+  if (pCtuLeft) DepthL = (pCtuLeft->getDepth(0)) + 2;
+  if (pCtuUp) DepthU = (pCtuUp->getDepth(0)) + 2;
 
-  }
-  if (pCtuLeft)
-  {
-	  CtuLeft[0] = rpcBestCU->getCtuLeft()->getDepth(80);
-	  CtuLeft[1] = rpcBestCU->getCtuLeft()->getDepth(112);
-	  CtuLeft[2] = rpcBestCU->getCtuLeft()->getDepth(208);
-	  CtuLeft[3] = rpcBestCU->getCtuLeft()->getDepth(240);
-	  SkipmodeL = pCtuLeft->isSkipped(80) || pCtuLeft->isSkipped(112) || pCtuLeft->isSkipped(208) || pCtuLeft->isSkipped(240);
-  }
-  int maxCtuA = 0, maxCtuL = 0;
   int picwid = (int)(rpcBestCU->getPic()->getPicYuvOrg()->getWidth(COMPONENT_Y)) + 160;
-  UInt SUM16 = 0;
-  UInt SUM8[4] = { 0 };
-  int average16 = 0;
-  int average8[4] = { 0 };
-  UInt SUMsquare16 = 0;
-  UInt SUMsquare8[4] = { 0 };
-  int SIGMA16 = 0;
-  int SIGMA8[4] = { 0 };
-  int HeightDifference[8] = { 0 };
-  int HeightDiffAvg = 0, WidthDiffAvg = 0;
-  int WidthDifference[8] = { 0 };
-  float datainput[14] = { 0 };
+  Int64 SUM16 = 0;
+  Int64 SUM8[4] = { 0 };
+  Int64 average16 = 0;
+  Int64 average8[4] = { 0 };
+  Int64 SUMsquare16 = 0;
+  Int64 SUMsquare8[4] = { 0 };
+  Int64 SIGMA16 = 0;
+  Int64 SIGMA8[4] = { 0 };
+  Int64 HeightDifference[8] = { 0 };
+  Int64 HeightDiffAvg = 0, WidthDiffAvg = 0;
+  Int64 WidthDifference[8] = { 0 };
+  bool Isedge = 1;
+  float datainput[12] = { 0 };
   bool neural_result = 0;
 
-  for (int loopfour = 0; loopfour < 4; loopfour++)
-  {
-	  if (CtuAbove[loopfour] > maxCtuA && pCtuUp) maxCtuA = CtuAbove[loopfour];
-	  if (CtuLeft[loopfour] > maxCtuL && pCtuLeft) maxCtuL = CtuLeft[loopfour];
-  }
-  if (uiDepth == 2)
+  if (uiDepth == 0)
   {
 	  for (int j = 0; j < 16; j++)
 	  {
 		  for (int i_5920 = 0; i_5920 < 16; i_5920++)
 		  {
 			  //fprintf(gfpCUP, "%d,", ptrSrc_5920[i_5920 + j*picwid]);
+			  if (ptrSrc_5920[i_5920 + j*picwid]<0) Isedge = 0;
 			  SUM16 = SUM16 + ptrSrc_5920[i_5920 + j*picwid];
 			  SUMsquare16 = SUMsquare16 + ptrSrc_5920[i_5920 + j*picwid] * ptrSrc_5920[i_5920 + j*picwid];
 			  if (i_5920 < 8 && j < 8)
@@ -808,57 +790,87 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, const 
 				  if (i_5920 == 8)
 				  {
 					  WidthDifference[j - 8] = ptrSrc_5920[i_5920 + j*picwid] - WidthDifference[j - 8];
-					  WidthDiffAvg = WidthDiffAvg + WidthDifference[j - 8];
+					  if (WidthDifference[j - 8]>0)
+						  WidthDiffAvg = WidthDiffAvg + WidthDifference[j - 8];
+					  else
+						  WidthDiffAvg = WidthDiffAvg - WidthDifference[j - 8];
 
 				  }
 				  if (j == 8)
 				  {
 					  HeightDifference[i_5920 - 8] = ptrSrc_5920[i_5920 + j*picwid] - HeightDifference[i_5920 - 8];
-					  HeightDiffAvg = HeightDiffAvg + HeightDifference[i_5920 - 8];
+					  if (HeightDifference[i_5920 - 8]>0)
+						  HeightDiffAvg = HeightDiffAvg + HeightDifference[i_5920 - 8];
+					  else
+						  HeightDiffAvg = HeightDiffAvg - HeightDifference[i_5920 - 8];
 				  }
 			  }
 
 		  }
 		  //fprintf(gfpCUP, "\n");
 	  }
-	  HeightDiffAvg = HeightDiffAvg / 8;
-	  WidthDiffAvg = WidthDiffAvg / 8;
-	  average16 = SUM16 / 256;
-	  average8[0] = SUM8[0] / 64;
-	  average8[1] = SUM8[1] / 64;
-	  average8[2] = SUM8[2] / 64;
-	  average8[3] = SUM8[3] / 64;
-	  SIGMA16 = SUMsquare16 / 256 - average16 * average16;
-	  SIGMA8[0] = SUMsquare8[0] / 64 - average8[0] * average8[0];
-	  SIGMA8[1] = SUMsquare8[1] / 64 - average8[1] * average8[1];
-	  SIGMA8[2] = SUMsquare8[2] / 64 - average8[2] * average8[2];
-	  SIGMA8[3] = SUMsquare8[3] / 64 - average8[3] * average8[3];
-	  datainput[0] = average16;
-	  datainput[1] = average8[0];
-	  datainput[2] = average8[1];
-	  datainput[3] = average8[2];
-	  datainput[4] = average8[3];
-	  datainput[5] = SIGMA16;
-	  datainput[6] = SIGMA8[0];
-	  datainput[7] = SIGMA8[1];
-	  datainput[8] = SIGMA8[2];
-	  datainput[9] = SIGMA8[3];
-	  datainput[10] = maxCtuA;
-	  datainput[11] = maxCtuL;
-	  datainput[12] = WidthDiffAvg;
-	  datainput[13] = HeightDiffAvg;
-	  neural_result = neural_cup(datainput);
-	  SUM16 = 0;
-	  SUM8[0] = 0;
-	  SUM8[1] = 0;
-	  SUM8[2] = 0;
-	  SUM8[3] = 0;
-	  SUMsquare16 = 0;
-	  SUMsquare8[0] = 0;
-	  SUMsquare8[1] = 0;
-	  SUMsquare8[2] = 0;
-	  SUMsquare8[3] = 0;
-	  if (bSubBranch && neural_result && (!getFastDeltaQp() || uiWidth > fastDeltaQPCuMaxSize || bBoundary))
+	  {
+		  HeightDiffAvg = HeightDiffAvg / 8;
+		  WidthDiffAvg = WidthDiffAvg / 8;
+		  average16 = SUM16 / 256;
+		  average8[0] = SUM8[0] / 64;
+		  average8[1] = SUM8[1] / 64;
+		  average8[2] = SUM8[2] / 64;
+		  average8[3] = SUM8[3] / 64;
+		  SIGMA16 = SUMsquare16 / 256 - average16 * average16;
+		  SIGMA8[0] = SUMsquare8[0] / 64 - average8[0] * average8[0];
+		  SIGMA8[1] = SUMsquare8[1] / 64 - average8[1] * average8[1];
+		  SIGMA8[2] = SUMsquare8[2] / 64 - average8[2] * average8[2];
+		  SIGMA8[3] = SUMsquare8[3] / 64 - average8[3] * average8[3];
+		  SUMsquare8[0] = 0;
+		  SUMsquare8[1] = 0;
+		  SUM8[0] = 0;
+		  SUM8[1] = 0;
+		  for (int j = 0; j < 4; j++)
+		  {
+			  SUMsquare8[0] = SUMsquare8[0] + SIGMA8[j] * SIGMA8[j];
+			  SUMsquare8[1] = SUMsquare8[1] + SIGMA8[j];
+			  SUM8[0] = SUM8[0] + average8[j] * average8[j];
+			  SUM8[1] = SUM8[1] + average8[j];
+		  }
+		  SUMsquare8[1] = SUMsquare8[1] / 4;
+		  SUMsquare8[2] = SUMsquare8[0] / 4 - SUMsquare8[1] * SUMsquare8[1];
+		  SUM8[1] = SUM8[1] / 4;
+		  SUM8[2] = SUM8[0] / 4 - SUM8[1] * SUM8[1];
+		  if (SIGMA8[0] != 0 && SIGMA8[1] != 0 && SIGMA8[2] != 0 && SIGMA8[3] != 0 && Isedge) {
+			  datainput[0] = average16;
+			  datainput[1] = average8[0];
+			  datainput[2] = average8[1];
+			  datainput[3] = average8[2];
+			  datainput[4] = average8[3];
+			  datainput[5] = SIGMA16 / 100;
+			  datainput[6] = SUMsquare8[2] / 100;
+			  datainput[7] = SUM8[2];
+			  datainput[8] = DepthU * 100;
+			  datainput[9] = DepthL * 100;
+			  datainput[10] = WidthDiffAvg;
+			  datainput[11] = HeightDiffAvg;
+			  neural_result = 1;//neural_result = neural_cup(datainput);
+		  }
+		  else
+		  {
+			  neural_result = 1;
+		  }
+		  Isedge = 1;
+		  SUM16 = 0;
+		  SUM8[0] = 0;
+		  SUM8[1] = 0;
+		  SUM8[2] = 0;
+		  SUM8[3] = 0;
+		  SUMsquare16 = 0;
+		  SUMsquare8[0] = 0;
+		  SUMsquare8[1] = 0;
+		  SUMsquare8[2] = 0;
+		  SUMsquare8[3] = 0;
+		  HeightDiffAvg = 0;
+		  WidthDiffAvg = 0;
+	  }
+	  if (bSubBranch && neural_result && uiDepth < sps.getLog2DiffMaxMinCodingBlockSize() && (!getFastDeltaQp() || uiWidth > fastDeltaQPCuMaxSize || bBoundary))
 	  {
 		  // further split
 		  for (Int iQP = iMinQP; iQP <= iMaxQP; iQP++)
