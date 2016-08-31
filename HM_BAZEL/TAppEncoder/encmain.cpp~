@@ -39,8 +39,6 @@
 #include <iostream>
 #include "TAppEncTop.h"
 #include "TAppCommon/program_options_lite.h"
-//#include "neural_cup.h"
-#include "NEURAL_CUP/neural_cup.h"
 //! \ingroup TAppEncoder
 //! \{
 
@@ -49,6 +47,8 @@ int piccount = 0;
 FILE* gfpCUP;
 bool DUMPSTART;
 std::string  getfilename;
+FILE* gfpTIME;
+std::string  getcfgname;
 // ====================================================================================================================
 // Main function
 // ====================================================================================================================
@@ -111,6 +111,8 @@ int main(int argc, char* argv[])
   // ending time
   dResult = (Double)(clock()-lBefore) / CLOCKS_PER_SEC;
   printf("\n Total Time: %12.3f sec.\n", dResult);
+  fprintf(gfpTIME,"Total Time: %12.3f sec.\n", dResult);
+  fclose(gfpTIME);
 
   // destroy application encoder class
   cTAppEncTop.destroy();

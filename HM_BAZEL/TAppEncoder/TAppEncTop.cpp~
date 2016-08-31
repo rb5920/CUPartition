@@ -47,8 +47,8 @@
 #include "TLibEncoder/AnnexBwrite.h"
 
 using namespace std;
-//extern FILE* gfpCUP;
-//extern std::string  getfilename;
+extern FILE* gfpCUP;
+extern std::string  getfilename;
 //! \ingroup TAppEncoder
 //! \{
 
@@ -413,13 +413,13 @@ Void TAppEncTop::xInitLibCfg()
 Void TAppEncTop::xCreateLib()
 {
   // Video I/O
-  //getfilename= m_inputFileName.substr(0, m_inputFileName.size()-8);
+  getfilename= m_inputFileName.substr(0, m_inputFileName.size()-8);
   m_cTVideoIOYuvInputFile.open( m_inputFileName,     false, m_inputBitDepth, m_MSBExtendedBitDepth, m_internalBitDepth );  // read  mode
-  //std::string EXPNAME, FILETYPE, FILENAME;
-  //EXPNAME = "TUPartition_";
-  //FILETYPE = ".csv";
-  //FILENAME = EXPNAME + getfilename + FILETYPE;
-  //gfpCUP = fopen(FILENAME.c_str(), "w");
+  std::string EXPNAME, FILETYPE, FILENAME;
+  EXPNAME = "TUPartition_";
+  FILETYPE = ".csv";
+  FILENAME = EXPNAME + getfilename + FILETYPE;
+  gfpCUP = fopen(FILENAME.c_str(), "w");
   m_cTVideoIOYuvInputFile.skipFrames(m_FrameSkip, m_iSourceWidth - m_aiPad[0], m_iSourceHeight - m_aiPad[1], m_InputChromaFormatIDC);
 
   if (!m_reconFileName.empty())

@@ -44,9 +44,9 @@
 
 #include "TLibCommon/Debug.h"
 int piccount = 0;
-FILE* gfpCUP;
 bool DUMPSTART;
-std::string  getfilename;
+FILE* gfpTIME;
+std::string  getcfgname;
 // ====================================================================================================================
 // Main function
 // ====================================================================================================================
@@ -105,10 +105,11 @@ int main(int argc, char* argv[])
   gfpCUP = fopen(FILENAME.c_str(), "w");*/
   cTAppEncTop.encode();
 	model16.Destroy();
-  fclose(gfpCUP);
   // ending time
   dResult = (Double)(clock()-lBefore) / CLOCKS_PER_SEC;
   printf("\n Total Time: %12.3f sec.\n", dResult);
+  fprintf(gfpTIME,"Total Time: %12.3f sec.\n", dResult);
+  fclose(gfpTIME);
 
   // destroy application encoder class
   cTAppEncTop.destroy();
